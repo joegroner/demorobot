@@ -86,7 +86,7 @@ class Settings extends React.Component {
       {
         id: 'webRequestHook',
         label: 'Hook into Web Requests.',
-        description: <span>Turn this feature on, if you want to use the commands !delayUrl, !blockUrl and !redirectUrl. <b>This will allow DemoMonkey to intercept, block, or modify requests in-flight</b>. To learn what this means, read about <a target="blank" rel="noopener noreferer" href="https://developer.chrome.com/extensions/webRequest">chrome.webRequest</a></span>
+        description: <span>Turn this feature on, if you want to use the commands !delayUrl, !blockUrl and !redirectUrl. <b>This will allow DemoRobot to intercept, block, or modify requests in-flight</b>. To learn what this means, read about <a target="blank" rel="noopener noreferer" href="https://developer.chrome.com/extensions/webRequest">chrome.webRequest</a></span>
       },
       {
         id: 'debugBox',
@@ -123,22 +123,22 @@ class Settings extends React.Component {
         id: 'noWarningForMissingPermissions',
         style: { display: this.props.hasExtendedPermissions ? 'none' : 'flex' },
         label: 'No warning for missing permissions.',
-        description: 'To work best, DemoMonkey requires permissions to interact with all sites, and will warn you if you don\'t provide those permissions. Turn this feature on to remove this warning.'
+        description: 'To work best, DemoRobot requires permissions to interact with all sites, and will warn you if you don\'t provide those permissions. Turn this feature on to remove this warning.'
       },
       {
         id: 'registerProtocolHandler',
         label: 'Register Protocol Handler.',
-        description: 'Turn this feature on to register web+mnky to be handled by demomonkey.'
+        description: 'Turn this feature on to register web+mnky to be handled by demorobot.'
       },
       {
         id: 'writeLogs',
         label: 'Write Logs.',
-        description: <span>Turn this feature on to have a DemoMonkey logs accessible via the <b>Logs</b> navigation item.</span>
+        description: <span>Turn this feature on to have a DemoRobot logs accessible via the <b>Logs</b> navigation item.</span>
       },
       {
         id: 'hookIntoKonva',
         label: 'Hook into konva.js API.',
-        description: <span>Turn this feature on to allow DemoMonkey to hook into <a href="https://konvajs.org/" target="_blank" rel='noopener noreferrer'>konva.js</a> API to modify text on canvas.</span>
+        description: <span>Turn this feature on to allow DemoRobot to hook into <a href="https://konvajs.org/" target="_blank" rel='noopener noreferrer'>konva.js</a> API to modify text on canvas.</span>
       }
     ]
 
@@ -149,7 +149,7 @@ class Settings extends React.Component {
           <Tabs activeTab={this.props.activeTab} onNavigate={this.props.onNavigate}>
             <Pane label="Optional Features" name="optionalFeatures">
               <label>
-                Optional features can be toggled on or off to influence the behaviour of DemoMonkey.
+                Optional features can be toggled on or off to influence the behaviour of DemoRobot.
               </label>
               {
                 optionalFeatures.map((feature, index) => {
@@ -185,16 +185,16 @@ class Settings extends React.Component {
             </Pane>
             <Pane label="More" name="more">
               <h2>{'Monkey\'s Behavior'}</h2>
-              <label>Change this value if you experience performance issues with DemoMonkey. A higher value means less frequent updates. Default is 100.</label>
+              <label>Change this value if you experience performance issues with DemoRobot. A higher value means less frequent updates. Default is 100.</label>
               <b>Update interval: </b>
               <input type="number" min="50" max="1000" value={this.state.monkeyInterval} onChange={(e) => this.updateMonkeyInterval(e)} />
               <button className="save-button" onClick={(e) => this.saveMonkeyInterval(e)}>save</button>
               <h2>Permissions</h2>
-              For DemoMonkey to work optimal you have to grant permissions to access all websites.
+              For DemoRobot to work optimally you have to grant permissions to access all websites.
               <div className="toggle-group" id="toggle-beta_configSync">
-                <ToggleButton onToggle={() => this.props.onRequestExtendedPermissions(this.props.hasExtendedPermissions)} value={this.props.hasExtendedPermissions}/><label><b>Allow access on all sites.</b> Allow DemoMonkey to read and change data on all sites you visit.</label>
+                <ToggleButton onToggle={() => this.props.onRequestExtendedPermissions(this.props.hasExtendedPermissions)} value={this.props.hasExtendedPermissions}/><label><b>Allow access on all sites.</b> Allow DemoRobot to read and change data on all sites you visit.</label>
               </div>
-              If you can not revoke permissions from here, go to the extensions page, choose Demo Monkey, click on <i>Details</i> and there set <i>Site Access</i> to <i>On click</i>
+              If you can not revoke permissions from here, go to the extensions page, choose DemoRobot, click on <i>Details</i> and there set <i>Site Access</i> to <i>On click</i>
               <h2>Backup</h2>
               You can always open the <a href="backup.html">backup page</a> to download your files or manipulate your settings. Please use with caution!
               <button className="save-button" onClick={(event) => this.props.onDownloadAll(event)}>Download all configurations</button>

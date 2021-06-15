@@ -1,11 +1,11 @@
 {
-  "name": "demomonkey",
+  "name": "demorobot",
   "license": "Apache-2.0",
-  "author": "Severin Neumann <severin.neumann@appdynamics.com>",
-  "homepage": "https://github.com/Appdynamics/demomonkey/",
+  "author": "Joe Groner <joe.groner@datarobot.com>",
+  "homepage": "https://github.com/joegroner/demorobot/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Appdynamics/demomonkey.git"
+    "url": "https://github.com/joegroner/demorobot.git"
   },
   "scripts": {
     "test": "mocha",

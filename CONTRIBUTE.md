@@ -1,8 +1,8 @@
 # Contribute
 
-The easiest way to contribute to the development of DemoMonkey, is reporting bugs or requesting new features. Go to https://github.com/Appdynamics/demomonkey/issues and add a ticket for your request.
+The easiest way to contribute to the development of DemoRobot, is reporting bugs or requesting new features. Go to https://github.com/joegroner/demorobot/issues and add a ticket for your request.
 
-The following document explains, how you can setup a development environment, so you can contribute code to DemoMonkey. It also provides a step by step guide to add custom commands.
+The following document explains, how you can setup a development environment, so you can contribute code to DemoRobot. It also provides a step by step guide to add custom commands.
 
 ## Setup Environment
 
@@ -11,7 +11,7 @@ Before you start, make sure you have *nodejs*, *webpack* and *mocha* installed.
 To get started, you need to checkout the latest development version via git:
 
 ```shell
-git clone https://github.com/svrnm/demomonkey.git
+git clone https://github.com/joegroner/demorobot.git
 cd demomonkey
 ```
 
@@ -21,7 +21,7 @@ Now, you need to download and install all dependencies for your  development env
 npm install
 ```
 
-The DemoMonkey repository includes configurations for eslint, csscomb, jsbeautify and lesshint. Install those tools and the required plugins for your IDE to have a more convenient development.
+The DemoRobot repository includes configurations for eslint, csscomb, jsbeautify and lesshint. Install those tools and the required plugins for your IDE to have a more convenient development.
 
 When `npm install` is finished you can run `webpack`, which will monitor the directory for code changes and auto-build updates:
 
@@ -161,6 +161,6 @@ class HelloWorld extends Command {
 export default HelloWorld
 ```
 
-As you can see, DemoMonkey expects you to get an `UndoElement`, that describes how to revert your command. It takes four parameters: the targeted node, the modified attribute of that node, the original value and the replaced value.
+As you can see, DemoRobot expects you to get an `UndoElement`, that describes how to revert your command. It takes four parameters: the targeted node, the modified attribute of that node, the original value and the replaced value.
 
 When you now, reload your extension, you can turn your configuration on and off and the replacements should be reverted every time you turn it off.

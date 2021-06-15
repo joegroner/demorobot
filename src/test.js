@@ -23,7 +23,7 @@
     counter++
     // document.getElementById('monkey-stats').innerHTML = 'Undo Length: ' + window.$DEMO_MONKEY.getUndoLength()
   }, 3000)
-  fetch('https://github.com/Appdynamics/demomonkey').then(function (response) {
+  fetch('https://github.com/joegroner/demorobot').then(function (response) {
     return response.text()
   }).then(function (response) {
     document.getElementById('ajax').innerHTML = response.split(/<\/?title>/)[1]

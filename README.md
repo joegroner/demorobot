@@ -1,11 +1,11 @@
-# DemoMonkey
+# DemoRobot
 Tamper your application's UI to demo anything
 
 ## Introduction
-Giving custom demos in the verticals of your prospects, shows them that you understand their specific requirements and that you did our homework. Although building meaningful demos is a time-consuming task, so not every demo is setup in the environment of our customers. DemoMonkey gives you a simple way of building custom demos for HTML5 based application. By providing text replacements you can go within minutes from an e-commerce demo application to a customer care center or flight booking service.
+Giving custom demos in the verticals of your prospects, shows them that you understand their specific requirements and that you did our homework. Although building meaningful demos is a time-consuming task, so not every demo is setup in the environment of our customers. DemoRobot gives you a simple way of building custom demos for HTML5 based application. By providing text replacements you can go within minutes from an e-commerce demo application to a customer care center or flight booking service.
 
 ## Usage
-DemoMonkey is driven by __configurations__, that contain replace patterns in the following format:
+DemoRobot is driven by __configurations__, that contain replace patterns in the following format:
 
 ```ini
 eCommerce = Booking Service
@@ -55,7 +55,7 @@ To use a pre-release version, you can also switch to the developer channel:
 https://chrome.google.com/webstore/detail/demomonkey-dev-channel/dgmdcddamkccpmefapgabnafjhhcdhdh
 
 ## Contribute
-If you want to contribute to the development of DemoMonkey, you can help by reporting issues, fixing bug or developing new features.
+If you want to contribute to the development of DemoRobot, you can help by reporting issues, fixing bug or developing new features.
 
 If you'd like to contribute code, read [CONTRIBUTE.md](CONTRIBUTE.md).
 
@@ -75,4 +75,4 @@ See the License for the specific language governing permissions and limitations 
 The Demo Monkey icon was created by Lora Tomova
 
 ## Contact ###
-For any questions you can contact [Severin Neumann](https://github.com/svrnm)
+For any questions you can contact [Joe Groner](https://github.com/joegroner)

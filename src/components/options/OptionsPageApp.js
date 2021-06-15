@@ -100,7 +100,7 @@ class App extends React.Component {
       .then(function (content) {
         const link = document.createElement('a')
         link.href = 'data:application/zip;base64,' + content
-        link.download = 'demomonkey-' + (new Date()).toISOString().split('T')[0] + '.zip'
+        link.download = 'demorobot-' + (new Date()).toISOString().split('T')[0] + '.zip'
         const event = document.createEvent('MouseEvents')
         event.initEvent('click', true, true)
         link.dispatchEvent(event)

@@ -56,8 +56,8 @@ describe('Configuration', function () {
     })
     it('complex ini should return multiple variables', function () {
       assert.deepStrictEqual(complexConfiguration.getVariables(), [
-        new Variable('url2', 'https://demomonkey', 'another url with https://'),
-        new Variable('url', 'https://demomonkey', ''),
+        new Variable('url2', 'https://demorobot', 'another url with https://'),
+        new Variable('url', 'https://demorobot', ''),
         new Variable('x', '1', ''),
         new Variable('y', '2', 'Set y')
       ])

@@ -1,7 +1,7 @@
 /* global chrome */
 import '../styles/main.less'
-import '../icons/monkey.png'
-import '../icons/monkey-dev.png'
+import '../icons/datarobot.png'
+import '../icons/datarobot-dev.png'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -83,7 +83,7 @@ store.ready().then(() => {
 
   const manifest = new Manifest(chrome)
 
-  logger('debug', `DemoMonkey ${manifest.version()}`).write()
+  logger('debug', `DemoRobot ${manifest.version()}`).write()
 
   const protocolHandler = new ProtocolHandler('web+mnky:')
   protocolHandler.handle(window.location.search).catch(error => {
@@ -105,8 +105,8 @@ store.ready().then(() => {
         break
       case 'DevToolsPageApp':
         if (window.store.state.settings.optionalFeatures.inDevTools === true) {
-          chrome.devtools.panels.create(`DemoMonkey ${manifest.version()}`,
-            'icons/monkey_16.png',
+          chrome.devtools.panels.create(`DemoRobot ${manifest.version()}`,
+            'icons/datarobot_16.png',
             'options.html',
             function (panel) {
               // code invoked on panel creation

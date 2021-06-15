@@ -164,11 +164,7 @@ function autocomplete(getRepository, variables) {
           ].map(value => { return { value, meta: 'status' } }))
         } else if (fullLine.match(/^@include\[\]\s*=\s*/)) {
           callback(null, [
-            '/^https?://.*\\.appdynamics\\.com(:[0-9]+)?/.*$/',
-            '/^https?://.*.thousandeyes.com/.*$/',
-            '/^https?://.*.service-now.com/.*$/',
-            '/^https?://.*\\.harness\\.io(:[0-9]+)?/.*$/',
-            '/^https?://.*\\.rookout\\.com/.*$/'
+            '/^https?://.*\\.datarobot\\.com(:[0-9]+)?/.*$/'
           ].map(value => { return { value, meta: 'include' } }))
         }
       }

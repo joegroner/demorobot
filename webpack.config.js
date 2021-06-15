@@ -26,7 +26,7 @@ module.exports = env => {
   const plugins = [
     new HtmlWebpackPlugin({
       chunks: ['app'],
-      title: 'Demo Monkey Dashboard',
+      title: 'DemoRobot Dashboard',
       template: 'pages/template.html',
       filename: 'options.html',
       appname: 'OptionsPageApp',
@@ -35,7 +35,7 @@ module.exports = env => {
     }),
     new HtmlWebpackPlugin({
       chunks: ['app'],
-      title: 'Demo Monkey Popup',
+      title: 'DemoRobot Popup',
       template: 'pages/template.html',
       filename: 'popup.html',
       appname: 'PopupPageApp',
@@ -44,7 +44,7 @@ module.exports = env => {
     }),
     new HtmlWebpackPlugin({
       chunks: ['app'],
-      title: 'Demo Monkey Toolbar',
+      title: 'DemoRobot Toolbar',
       template: 'pages/template.html',
       filename: 'devtools.html',
       inject: 'head',
@@ -53,7 +53,7 @@ module.exports = env => {
     }),
     new HtmlWebpackPlugin({
       chunks: ['background'],
-      title: 'Demo Monkey Background',
+      title: 'DemoRobot Background',
       template: 'pages/template.html',
       filename: 'background.html',
       inject: 'head',
@@ -93,7 +93,7 @@ module.exports = env => {
 
   if (isRelease) {
     plugins.push(new ZipPlugin({
-      filename: `DemoMonkey-${manifest.version}-${releaseSuffix}.zip`,
+      filename: `DemoRobot-${manifest.version}-${releaseSuffix}.zip`,
       path: '..'
     }))
   } else {

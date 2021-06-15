@@ -273,7 +273,7 @@ class Editor extends React.Component {
           </Pane> */}
           <Pane link={(e) => {
             e.preventDefault()
-            window.open('https://github.com/Appdynamics/demomonkey/blob/master/SHORTCUTS.md')
+            window.open('https://github.com/joegroner/demorobot/blob/master/SHORTCUTS.md')
           }} label="Shortcuts"/>
         </Tabs>
       </div>

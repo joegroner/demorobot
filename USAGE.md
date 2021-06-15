@@ -1,10 +1,10 @@
-# DemoMonkey - Usage
+# DemoRobot - Usage
 
-Read on to learn how you can use DemoMonkey, to tamper your web application to demo almost anything.
+Read on to learn how you can use DemoRobot, to tamper your web application to demo almost anything.
 
 ## Configurations
 
-DemoMonkey is driven by configuration files you write in the integrated editor. You provide lists of search and replace patterns, that will be applied once DemoMonkey is running. The structure of the file is similar to an **ini** file:
+DemoRobot is driven by configuration files you write in the integrated editor. You provide lists of search and replace patterns, that will be applied once DemoRobot is running. The structure of the file is similar to an **ini** file:
 
 ```
 search = replace
@@ -82,32 +82,7 @@ Outside of namespaces you can always use the following commands:
 
 ## Namespaces
 
-Commands specific to a certain web application are provided via a namespace. Currently DemoMonkey only knows the **appdynamics** namespace with the following commands:
-
-- **!replaceFlowmapIcon(label) = replacement**: Replace the type of a tier or backend on the flowmap.
-- **!hideApplication(label)**: Hide the given application.
-- **!hideBusinessTransaction(label)**: Hide the given business transaction.
-- **!hideDatabase(label)**: Hide the given database
-- **!hideBrowserApplication(label)**: Hide the given browser application for EUM
-- **!hideMobileApplication(label)**: Hide the given mobile application for EUM
-- **!hideBusinessJourney(label)**: Hide the given business journey
-- **!hideAnalyticsSearch(label)**: Hide the given analytics search
-- **!hideRemoteService(label)**: Hide the given remote service in the list view
-- **!replaceFlowmapConnection(label1, label2, force) = replacement**: Replace the color between two elements on the flowmap. Possible values for **replacement** are Warning, Critical, Unknown, Normal, Async and Hide. Set the force option to replace the label even if no baseline is shown.
-- **!hideFlowmapConnection(label1, label2)**: Hide the connection between two elements on the flowmap.
-- **!replaceMobileScreenshot() = replacement**: Replace a screenshot taken during a mobile session.
-- **!replaceNodeCount(nodeName) = replacement**: Replace the node count on the flowmap for the node with name nodeName
-- **!recolorDashboard(oldColor, dashboardId) = newColor**: Replace the oldColor with newColor on a dashboard. If provided, only if dashboardId matches.
-- **!setDashboardBackground(dashboardID) = background**: Change the background of a dashboard. You can provide an image url or a color. If provided, the background is only replaced if the dashboardId matches.
-- **!replaceApplication(app) = replacement**: If replacement is empty, this behaves like !hideApplication, otherwise app is replaced with replacement.
-- **!replaceBusinessTransactionHealth(bt) = status**: Set the health status of a business transaction.
-- **!replaceInnerNodeHealth(label) = status**: Set the inner health status of a node on the flowmap.
-- **!replaceOuterNodeHealth(label, level) = status**: Set the outer health status of a node on the flowmap. By default the currently normal section is replaced. Give a level to replace warning or critical.
-- **!replaceBusinessTransactionOriginalName(label) = replacement**: Replace the original name of a business transaction.
-- **!replaceBusinessTransactionHealth(label) = replacement**: Replace the health of a business transaction.
-- **!replaceBusinessTransaction(bt) = newName,newOriginalName,newHealth**: If replacement is empty, this behaves like !hideBusinessTransaction, otherwise bt is replaced with newName, the original name is set to newOriginalName and the health is set to newHealth
-- **!replaceFlowmapNode(label) = newName,newCount,newInnerHealth,newOuterHealth**: This command groups the renaming of a node, the node cound and the node health in a single command.
-- **!replaceIOTNumericWidget(label) = replacement**: Change the value of an IOT widget based on the widget label
+Removed by Joe Groner to make more vendor neutral.
 
 
 ## Variables
