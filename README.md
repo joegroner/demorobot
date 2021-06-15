@@ -72,7 +72,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the License for the specific language governing permissions and limitations under the License.
 
 ## Attribution
-The Demo Monkey icon was created by Lora Tomova
+(icon?)
 
 ## Contact ###
 For any questions you can contact [Joe Groner](https://github.com/joegroner)
