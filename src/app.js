@@ -1,7 +1,7 @@
 /* global chrome */
 import '../styles/main.less'
-import '../icons/datarobot.png'
-import '../icons/datarobot-dev.png'
+import '../icons/demorobot.png'
+import '../icons/demorobot-dev.png'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -106,7 +106,7 @@ store.ready().then(() => {
       case 'DevToolsPageApp':
         if (window.store.state.settings.optionalFeatures.inDevTools === true) {
           chrome.devtools.panels.create(`DemoRobot ${manifest.version()}`,
-            'icons/datarobot_16.png',
+            'icons/demorobot_16.png',
             'options.html',
             function (panel) {
               // code invoked on panel creation

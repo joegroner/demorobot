@@ -62,6 +62,7 @@ If you'd like to contribute code, read [CONTRIBUTE.md](CONTRIBUTE.md).
 ## License
 
 Copyright 2017 AppDynamics LLC
+Icons Copyright 2021 Joe Groner
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -72,7 +73,6 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the License for the specific language governing permissions and limitations under the License.
 
 ## Attribution
-(icon?)
 
 ## Contact ###
 For any questions you can contact [Joe Groner](https://github.com/joegroner)

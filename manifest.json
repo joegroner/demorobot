@@ -7,9 +7,9 @@
   "homepage_url": "https://github.com/joegroner/demorobot/",
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
   "icons": {
-    "16": "icons/datarobot_16.png",
-    "48": "icons/datarobot_48.png",
-    "128": "icons/datarobot_128.png"
+    "16": "icons/demorobot_16.png",
+    "48": "icons/demorobot_48.png",
+    "128": "icons/demorobot_128.png"
   },
   "web_accessible_resources": [
     "manifest.json",
@@ -23,7 +23,7 @@
     "open_in_tab": true
   },
   "browser_action": {
-    "default_icon": "icons/datarobot_16.png",
+    "default_icon": "icons/demorobot_16.png",
     "default_title": "DemoRobot",
     "default_popup": "popup.html"
   },
