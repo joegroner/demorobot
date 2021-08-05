@@ -147,7 +147,7 @@ class Monkey {
       })
     })
 
-    // In AppDynamics Analytics the Tree widget view uses <tspan> in <text> to split
+    // In Analytics the Tree widget view uses <tspan> in <text> to split
     // text over multiple lines. The full text is contained in a <title> tag.
     // So we search for the <title> in the <text> and check if tspans are contained.
     this.scope.document.querySelectorAll('svg text title').forEach(title => {
@@ -182,7 +182,7 @@ class Monkey {
       }
     })
 
-    // In AppDynamics Analytics the Business Journey view shortens labels over the milestones.
+    // In Analytics the Business Journey view shortens labels over the milestones.
     // In the source it looks like the following: Case <text>Lon...<title>Long Text</title></text>
     this.scope.document.querySelectorAll('svg text title').forEach(title => {
       if (title.parentElement.textContent.includes('...')) {
@@ -219,7 +219,7 @@ class Monkey {
       undos.push(new UndoElement(tspan, 'textContent', original, tspan.textContent))
     })
 
-    // The Experience Journey Map in AppDynamics shortens the labels but provides a "data-full-string"
+    // The Experience Journey Map shortens the labels but provides a "data-full-string"
     // property we can work with
     this.scope.document.querySelectorAll('eum-user-journey-map-label > div.eum-ui-user-journey-node-body').forEach(node => {
       const pseudoNode = {

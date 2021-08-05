@@ -272,22 +272,6 @@ class ModeManager {
             }
 
             const [editor, cb] = (() => {
-              // Special handler for flow map icons
-              if (target.classList.contains('adsFlowNodeTypeIcon')) {
-                try {
-                  const label = target.parentElement.parentElement.querySelector('title').textContent
-                  const e = this.scope.document.createElement('select');
-                  ['java', '.net', 'php', 'node.js', 'python', 'c++', 'webserver', 'wmb', 'go'].forEach(label => {
-                    const o = this.scope.document.createElement('option')
-                    o.text = label
-                    e.add(o, null)
-                  })
-                  e.addEventListener('change', (event) => apply(event, label, event.target.value, 'appdynamics.replaceFlowmapIcon'))
-                  return [e, false]
-                } catch (error) {
-                  return [error.getMessage(), () => {}]
-                }
-              }
               const text = target.textContent.trim()
               const e = this.scope.document.createElement('input')
               e.value = text

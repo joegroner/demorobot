@@ -61,7 +61,7 @@ class Command {
   }
 
   static _getColorFromValue(value) {
-    // There are some "magic" colors for appdynamics dashboards
+    // There are some "magic" colors
     const magicColors = {
       'ad-purple': Color('#7e69d2'),
       'ad-cyan': Color('#01CEDA'),
