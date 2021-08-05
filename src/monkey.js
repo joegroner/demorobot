@@ -94,12 +94,12 @@ try {
           webRequestHook: settings.isFeatureEnabled('webRequestHook')
         })
         onStart($DEMO_MONKEY.start())
-        logger('debug', 'DemoMonkey enabled. Tampering the content. Interval: ', settings.monkeyInterval).write()
+        logger('debug', 'DemoRobot enabled. Tampering the content. Interval: ', settings.monkeyInterval).write()
 
         const modeManager = new ModeManager(scope, $DEMO_MONKEY, new Manifest(scope.chrome), settings.isDebugEnabled(), settings.isFeatureEnabled('debugBox'), settings.isLiveModeEnabled(), settings.analyticsSnippet)
 
         function restart() {
-          logger('debug', 'Restart DemoMonkey').write()
+          logger('debug', 'Restart DemoRobot').write()
           // Update settings
           const settings = new Settings(store.getState().settings)
           const newMonkey = new Monkey(store.getState().configurations, scope, settings.globalVariables, settings.isFeatureEnabled('undo'), settings.monkeyInterval, urlManager, inlineRuleManager, {

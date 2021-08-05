@@ -31,7 +31,7 @@ class Help extends React.Component {
     // We try to fetch USAGE.md from github directly, this allows to update
     // the inline usage docs without having to make a release every time
     // on the google chrome webstore.
-    fetch('https://raw.githubusercontent.com/svrnm/DemoMonkey/main/USAGE.md')
+    fetch('https://raw.githubusercontent.com/joegroner/demorobot/master/USAGE.md')
       .then(response => response.text())
       .then(data => this.setState({ usage: data, loaded: true }))
       .catch(() => {

@@ -1,6 +1,6 @@
 /* eslint-disable */
 /* Dedicated Javascript for backup. This is a fallback if a version of
-   DemoMonkey is broken and user want to extract their scripts.
+   DemoRobot is broken and user want to extract their scripts.
 
    This also includes capabilities to directly manipulate the chrome storage.
  */

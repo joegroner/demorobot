@@ -86,7 +86,7 @@ class Monkey {
   apply(configuration) {
     const t0 = this.scope.performance.now()
     const sum = {}
-    // Some UIs provide corner cases we want to cover with DemoMonkey for ease of use
+    // Some UIs provide corner cases we want to cover with DemoRobot for ease of use
     // Most of them are text, that is shortened or split over multiple elements.
     // We do them early, because later modifications may cause problems to get them solved.
     this._cornerCases(configuration)

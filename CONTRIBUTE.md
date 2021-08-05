@@ -1,6 +1,6 @@
 # Contribute
 
-The easiest way to contribute to the development of DemoMonkey, is reporting bugs or requesting new features. Go to
+The easiest way to contribute to the development of DemoRobot, is reporting bugs or requesting new features. Go to
 [https://github.com/joegroner/demorobot/issues](https://github.com/joegroner/demorobot/issues) and add a ticket for your
 request.
 

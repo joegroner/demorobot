@@ -191,7 +191,7 @@ class Settings extends React.Component {
               You can always open the <a href="backup.html">backup page</a> to download your files or manipulate your settings. Please use with caution!
               <button className="save-button" onClick={(event) => this.props.onDownloadAll(event)}>Download all configurations</button>
               <button className="delete-button" onClick={(event) => this.props.onDeleteAll(event)}>Download & Delete all configurations</button>
-              <button className="delete-button" onClick={(event) => this.props.onReset(event)}>Reset DemoMonkey</button>
+              <button className="delete-button" onClick={(event) => this.props.onReset(event)}>Reset DemoRobot</button>
             </Pane>
           </Tabs>
         </div>

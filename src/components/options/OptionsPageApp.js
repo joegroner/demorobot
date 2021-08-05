@@ -237,7 +237,7 @@ class App extends React.Component {
       .then(function (content) {
         const link = document.createElement('a')
         link.href = 'data:application/zip;base64,' + content
-        link.download = 'demomonkey-' + (new Date()).toISOString().split('T')[0] + '.zip'
+        link.download = 'demorobot-' + (new Date()).toISOString().split('T')[0] + '.zip'
         const event = document.createEvent('MouseEvents')
         event.initEvent('click', true, true)
         link.dispatchEvent(event)
@@ -340,7 +340,7 @@ class App extends React.Component {
     event.preventDefault()
 
     Popup.create({
-      title: 'Reset DemoMonkey',
+      title: 'Reset DemoRobot',
       content: <span>Do you really want to reset <b>all configurations and all settings</b>?<br />(This window will close.)</span>,
       buttons: {
         left: [{
