@@ -1,11 +1,27 @@
-/* eslint no-template-curly-in-string: "off" */
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* eslint-disable no-template-curly-in-string */
+
 import langTools from 'ace-builds/src-noconflict/ext-language_tools'
 import colors from 'color-name'
-import ReplaceFlowmapIcon from '../../../../commands/appdynamics/ReplaceFlowmapIcon'
 
 import registry from '../../../../commands/CommandRegistry'
 
-import { snippetManager } from 'ace-builds/src-noconflict/snippets/snippets'
+import ace from 'ace-builds'
+
+const snippetManager = ace.require('ace/snippets').snippetManager
 
 function signature2snippet(signature) {
   return signature.replace(/\${(\d):[^}]*}/g, (match, d) => { return '${' + d + '}' })
@@ -35,8 +51,8 @@ function autocomplete(getRepository, variables) {
     { caption: '@include', snippet: '@include[] = ${1}' }, /* , docText: 'TBD' */
     { caption: '@exclude', snippet: '@exclude[] = ${1}' },
     { caption: '@namespace', snippet: '@namespace[] = ${1}' },
-    { caption: '@blacklist', snippet: '@blacklist[] = ${1}' },
-    { caption: '@whitelist', snippet: '@whitelist[] = ${1}' },
+    { caption: '@blocklist', snippet: '@blocklist[] = ${1}' },
+    { caption: '@allowlist', snippet: '@allowlist[] = ${1}' },
     { caption: '@author', snippet: '@author[] = ${1}' },
     { caption: '@textAttributes', snippet: '@textAttributes[] = ${1}' },
     { caption: '@template', snippet: '@template\n' },
@@ -60,11 +76,7 @@ function autocomplete(getRepository, variables) {
       }
     }
     const content = getRepository().findByName(data.configName).rawContent
-    if (content.includes('@template')) {
-      snippetManager.insertSnippet(editor, content.replace('@template', ''))
-    } else {
-      editor.execCommand('insertstring', content)
-    }
+    snippetManager.insertSnippet(editor, content.replace(/@template\S*[\r\n]+/g, ''))
   }
 
   langTools.setCompleters([{
@@ -125,44 +137,7 @@ function autocomplete(getRepository, variables) {
         const lineToPos = fullLine.substr(0, pos.column - prefix.length)
         // replaceFlowmapIcon provides some values.
         // console.log(fullLine, lineToPos)
-        if (fullLine.match(/^!(?:appdynamics.)?replaceFlowmapIcon\(.*\)\s*=\s*/)) {
-          callback(null, Object.keys(ReplaceFlowmapIcon.icons).map(value => { return { value, meta: 'icon' } }))
-        } else if (lineToPos.match(/^!(?:appdynamics.)?(hide|replace)Application\($/)) {
-          callback(null, [
-            'AD-DevOps', 'AD-Travel', 'Online-Retail', 'AD-Financial', 'AD-Financial-Next', 'AD-Fraud-Detection', 'AD-Capital-Rookout', 'AD-Retail', 'Movie Tickets Online', 'AD-DevOps-Offers', 'ECommerce',
-            'AD-MovieTickets-Core', 'ECommerce-Fulfillment', 'AD-Financial-Cloud', 'SAP-ERP'
-          ].sort().map(value => { return { value, meta: 'application' } }))
-        } else if (lineToPos.match(/^!(?:appdynamics.)?recolorDashboard\($/) || fullLine.match(/^!(?:appdynamics.)?recolorDashboard\(.*\)\s*=\s*/)) {
-          callback(null, Object.keys(colors).concat([
-            'ad-purple',
-            'ad-cyan',
-            'ad-blue',
-            'ad-green',
-            'ad-turquoise',
-            'ad-lightgray',
-            'ad-lightgrey',
-            'ad-darkgrey',
-            'ad-darkgray',
-            'ad-pink',
-            'ad-red'
-          ]).sort().map(value => { return { value, meta: 'color' } }))
-        } else if (lineToPos.match(/^!replaceImage\($/)) {
-          callback(null, [
-            'ad-travel-logo',
-            'ad-logo',
-            'ad-devops-bg-1',
-            'ad-devops-bg-2',
-            'ad-devops-bg-3',
-            'ad-devops-bg-4',
-            'ad-devops-bg-5'
-          ].sort().map(value => { return { value, meta: 'image' } }))
-        } else if (fullLine.match(/^!(?:appdynamics.)?replaceDrillDownHealth\(.*\)\s*=\s*/)) {
-          callback(null, [
-            'normal',
-            'warning',
-            'critical'
-          ].map(value => { return { value, meta: 'status' } }))
-        } else if (fullLine.match(/^@include\[\]\s*=\s*/)) {
+        if (fullLine.match(/^@include\[\]\s*=\s*/)) {
           callback(null, [
             '/^https?://.*\\.datarobot\\.com(:[0-9]+)?/.*$/'
           ].map(value => { return { value, meta: 'include' } }))

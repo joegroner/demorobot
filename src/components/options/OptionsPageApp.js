@@ -1,4 +1,16 @@
-/* global chrome */
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 import React from 'react'
 import Navigation from './navigation/Navigation'
 import { connect } from 'react-redux'
@@ -59,23 +71,23 @@ class App extends React.Component {
     this.mql.addListener(this.darkModeUpdated)
 
     this.permissionsUpdated = () => {
-      chrome.permissions.getAll((permissions) => {
+      window.chrome.permissions.getAll((permissions) => {
         logger('info', 'Permissions updated:', permissions).write()
         this.setState({ permissions })
       })
     }
 
-    if (chrome.permissions.onAdded) {
-      chrome.permissions.onAdded.addListener(this.permissionsUpdated)
-      chrome.permissions.onRemoved.addListener(this.permissionsUpdated)
+    if (window.chrome.permissions.onAdded) {
+      window.chrome.permissions.onAdded.addListener(this.permissionsUpdated)
+      window.chrome.permissions.onRemoved.addListener(this.permissionsUpdated)
     }
   }
 
   componentWillUnmount() {
     this.mql.removeListener(this.darkModeUpdated)
-    if (chrome.permissions.onAdded) {
-      chrome.permissions.onAdded.removeListener(this.permissionsUpdated)
-      chrome.permissions.onRemoved.removeListener(this.permissionsUpdated)
+    if (window.chrome.permissions.onAdded) {
+      window.chrome.permissions.onAdded.removeListener(this.permissionsUpdated)
+      window.chrome.permissions.onRemoved.removeListener(this.permissionsUpdated)
     }
     window.removeListener('onpopstate', this.ops)
     delete this.mql
@@ -86,26 +98,6 @@ class App extends React.Component {
     this.setState({ currentView: target }, () => {
       this.props.onCurrentViewChange(target)
     })
-  }
-
-  downloadAll(event, cb = () => {}) {
-    event.preventDefault()
-    const zip = new JSZip()
-
-    this.props.configurations.forEach((configuration) => {
-      zip.file(configuration.name + '.mnky', configuration.content)
-    })
-
-    zip.generateAsync({ type: 'base64' })
-      .then(function (content) {
-        const link = document.createElement('a')
-        link.href = 'data:application/zip;base64,' + content
-        link.download = 'demorobot-' + (new Date()).toISOString().split('T')[0] + '.zip'
-        const event = document.createEvent('MouseEvents')
-        event.initEvent('click', true, true)
-        link.dispatchEvent(event)
-        cb()
-      })
   }
 
   deleteAll() {
@@ -154,7 +146,6 @@ class App extends React.Component {
         this.isSaving = true
         this.props.actions.saveConfiguration(configuration.id, configuration).then(() => {
           this.isSaving = false
-          console.log('Saved')
         })
       }
     }
@@ -197,7 +188,6 @@ class App extends React.Component {
   addConfiguration(configuration) {
     this.props.actions.addConfiguration(configuration).then(() => {
       const latest = this.props.configurations[this.props.configurations.length - 1]
-      console.log(latest)
       this.navigateTo('configuration/' + latest.id)
     })
   }
@@ -215,13 +205,44 @@ class App extends React.Component {
     })
   }
 
+  _prepareForDownload(configuration) {
+    /*
+    if (configuration.values) {
+      const result = configuration.content + '\n\n; --- {VARIABLE VALUES} ---\n' + JSON.stringify(configuration.values).replace(/^/, ';')
+      console.log(result)
+      return result
+    }
+    */
+    return configuration.content
+  }
+
   downloadConfiguration(configuration) {
     const link = document.createElement('a')
-    link.href = 'data:text/octet-stream;base64,' + Base64.encode(configuration.content)
+    link.href = 'data:text/octet-stream;base64,' + Base64.encode(this._prepareForDownload(configuration))
     link.download = configuration.name.split('/').pop() + '.mnky'
     const event = document.createEvent('MouseEvents')
     event.initEvent('click', true, true)
     link.dispatchEvent(event)
+  }
+
+  downloadAll(event, cb = () => {}) {
+    event.preventDefault()
+    const zip = new JSZip()
+
+    this.props.configurations.forEach((configuration) => {
+      zip.file(configuration.name + '.mnky', this._prepareForDownload(configuration))
+    })
+
+    zip.generateAsync({ type: 'base64' })
+      .then(function (content) {
+        const link = document.createElement('a')
+        link.href = 'data:application/zip;base64,' + content
+        link.download = 'demomonkey-' + (new Date()).toISOString().split('T')[0] + '.zip'
+        const event = document.createEvent('MouseEvents')
+        event.initEvent('click', true, true)
+        link.dispatchEvent(event)
+        cb()
+      })
   }
 
   deleteConfiguration(configuration) {
@@ -283,9 +304,8 @@ class App extends React.Component {
   }
 
   registerProtocolHandler() {
-    const url = chrome.runtime.getURL('/options.html?s=%s')
+    const url = window.chrome.runtime.getURL('/options.html?s=%s')
     const method = this.props.settings.optionalFeatures.registerProtocolHandler ? 'registerProtocolHandler' : 'unregisterProtocolHandler'
-    console.log(method)
     window.navigator[method](
       'web+mnky',
       url,
@@ -304,12 +324,40 @@ class App extends React.Component {
     this.props.actions.setBaseTemplate(baseTemplate)
   }
 
+  setAnalyticsSnippet(analyticsSnippet) {
+    this.props.actions.setAnalyticsSnippet(analyticsSnippet)
+  }
+
   saveGlobalVariables(globalVariables) {
     this.props.actions.saveGlobalVariables(globalVariables)
   }
 
   setMonkeyInterval(interval) {
     this.props.actions.setMonkeyInterval(interval)
+  }
+
+  resetDemoMonkey(event) {
+    event.preventDefault()
+
+    Popup.create({
+      title: 'Reset DemoMonkey',
+      content: <span>Do you really want to reset <b>all configurations and all settings</b>?<br />(This window will close.)</span>,
+      buttons: {
+        left: [{
+          text: 'Cancel',
+          action: () => Popup.close()
+        }],
+        right: [{
+          text: 'Reset',
+          className: 'danger',
+          action: () => {
+            window.chrome.storage.local.clear(() => {
+              window.chrome.runtime.reload()
+            })
+          }
+        }]
+      }
+    })
   }
 
   getCurrentView() {
@@ -329,10 +377,13 @@ class App extends React.Component {
             configurations={this.props.configurations}
             onToggleOptionalFeature={(feature) => this.toggleOptionalFeature(feature)}
             onSetBaseTemplate={(baseTemplate) => this.setBaseTemplate(baseTemplate)}
+            onSetAnalyticsSnippet={(analyticsSnippet) => this.setAnalyticsSnippet(analyticsSnippet)}
+            getRepository={() => this.getRepository()}
             onSaveGlobalVariables={(globalVariables) => this.saveGlobalVariables(globalVariables)}
             onSetMonkeyInterval={(value) => this.setMonkeyInterval(value)}
             onDownloadAll={(event) => this.downloadAll(event)}
             onDeleteAll={(event) => this.deleteAll(event)}
+            onReset={(event) => this.resetDemoMonkey(event)}
             onRequestExtendedPermissions={(revoke) => this.requestExtendedPermissions(revoke)}
             hasExtendedPermissions={this.hasExtendedPermissions()}
             isDarkMode={this._getDarkMode()}
@@ -386,7 +437,7 @@ class App extends React.Component {
   requestExtendedPermissions(revoke = false) {
     console.log(revoke)
     if (revoke) {
-      chrome.permissions.remove({
+      window.chrome.permissions.remove({
         origins: ['http://*/*', 'https://*/*']
       }, function (removed) {
         if (removed) {
@@ -396,7 +447,7 @@ class App extends React.Component {
         }
       })
     } else {
-      chrome.permissions.request({
+      window.chrome.permissions.request({
         origins: ['http://*/*', 'https://*/*']
       }, function (granted) {
         if (granted) {
@@ -483,6 +534,9 @@ const OptionsPageApp = connect(
       },
       setBaseTemplate: (baseTemplate) => {
         dispatch({ type: 'SET_BASE_TEMPLATE', baseTemplate })
+      },
+      setAnalyticsSnippet: (analyticsSnippet) => {
+        dispatch({ type: 'SET_ANALYTICS_SNIPPET', analyticsSnippet })
       },
       saveGlobalVariables: (globalVariables) => {
         dispatch({ type: 'SAVE_GLOBAL_VARIABLES', globalVariables })

@@ -1,3 +1,16 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 import React from 'react'
 import ToggleButton from 'react-toggle-button'
 import PropTypes from 'prop-types'
@@ -5,7 +18,10 @@ import AceEditor from 'react-ace'
 import Tabs from '../../shared/Tabs'
 import Pane from '../../shared/Pane'
 import GlobalVariables from './GlobalVariables'
+import CodeEditor from '../editor/CodeEditor'
+import OptionalFeature from '../../../models/OptionalFeature'
 
+import 'ace-builds/src-noconflict/mode-html'
 import 'ace-builds/src-noconflict/theme-xcode'
 import 'ace-builds/src-noconflict//theme-merbivore'
 import 'ace-builds/src-noconflict/ext-searchbox'
@@ -17,11 +33,14 @@ class Settings extends React.Component {
     settings: PropTypes.object.isRequired,
     configurations: PropTypes.arrayOf(PropTypes.object).isRequired,
     onSetBaseTemplate: PropTypes.func.isRequired,
+    onSetAnalyticsSnippet: PropTypes.func.isRequired,
+    getRepository: PropTypes.func.isRequired,
     onSaveGlobalVariables: PropTypes.func.isRequired,
     onSetMonkeyInterval: PropTypes.func.isRequired,
     onToggleOptionalFeature: PropTypes.func.isRequired,
     onDownloadAll: PropTypes.func.isRequired,
     onDeleteAll: PropTypes.func.isRequired,
+    onReset: PropTypes.func.isRequired,
     isDarkMode: PropTypes.bool.isRequired,
     hasExtendedPermissions: PropTypes.bool.isRequired,
     onRequestExtendedPermissions: PropTypes.func.isRequired,
@@ -32,6 +51,8 @@ class Settings extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
+      analyticsSnippet: this.props.settings.analyticsSnippet,
+      baseTemplate: this.props.settings.baseTemplate,
       monkeyInterval: this.props.settings.monkeyInterval,
       archiveValue: 30
     }
@@ -53,94 +74,32 @@ class Settings extends React.Component {
     this.props.onSetMonkeyInterval(this.state.monkeyInterval)
   }
 
+  updateAnalyticsSnippet(analyticsSnippet) {
+    this.setState({
+      analyticsSnippet
+    })
+  }
+
+  updateBaseTemplate(baseTemplate) {
+    this.setState({
+      baseTemplate
+    })
+  }
+
+  saveBaseTemplate() {
+    this.props.onSetBaseTemplate(this.state.baseTemplate)
+  }
+
+  saveAnalyticsSnippet() {
+    this.props.onSetAnalyticsSnippet(this.state.analyticsSnippet)
+  }
+
   render() {
-    const optionalFeatures = [
-      {
-        id: 'undo',
-        label: 'Undo replacements',
-        description: 'when configuration is disabled'
-      },
-      {
-        id: 'autoReplace',
-        label: 'Automatically apply replacements',
-        description: <span>when configuration is saved. <i>(This will also disable undo)</i></span>
-      },
-      {
-        id: 'autoSave',
-        label: 'Save configuration on line break'
-      },
-      {
-        id: 'saveOnClose',
-        label: 'Save configuration when it is closed'
-      },
-      {
-        id: 'editorAutocomplete',
-        label: 'Autocomplete.',
-        description: 'The editor for configurations will display an auto completion for commands, options & imports.'
-      },
-      {
-        id: 'onlyShowAvailableConfigurations',
-        label: 'Only show available configurations.',
-        description: 'Set the default value for the popup toggle, which hides configurations that are not available for the current url.'
-      },
-      {
-        id: 'webRequestHook',
-        label: 'Hook into Web Requests.',
-        description: <span>Turn this feature on, if you want to use the commands !delayUrl, !blockUrl and !redirectUrl. <b>This will allow DemoRobot to intercept, block, or modify requests in-flight</b>. To learn what this means, read about <a target="blank" rel="noopener noreferer" href="https://developer.chrome.com/extensions/webRequest">chrome.webRequest</a></span>
-      },
-      {
-        id: 'debugBox',
-        label: 'Expand Debug Box',
-        description: <span>Turn this feature on, to show the debug box with statistics in full length when running demo monkey in <i>debug mode</i></span>
-      },
-      {
-        id: 'keyboardHandlerVim',
-        label: 'VIM Keyboard Handler.',
-        description: 'Turn this feature on, to use the vim keyboard handler for the editor.'
-      },
-      {
-        id: 'withEvalCommand',
-        label: 'Allow !eval.',
-        description: 'By turning on this flag, you can use the command !eval which allows you to write arbitrary javascript code. Use with caution!'
-      },
-      {
-        id: 'hookIntoAjax',
-        label: 'Hook into Ajax.',
-        description: '(Experimental) Turn this feature on, if you want to use commands !removeFlowmapNode, !addFlowmapNode, etc. Those commands are implemented by hooking into ajax calls, use with caution!'
-      },
-      {
-        id: 'syncDarkMode',
-        label: 'Sync Dark/Light mode with OS setting.',
-        description: 'Automatically switch between dark and light mode.'
-      },
-      {
-        id: 'preferDarkMode',
-        style: { display: this.props.settings.optionalFeatures.syncDarkMode ? 'none' : 'flex' },
-        label: 'Use dark mode.',
-        description: <span>Use this toggle to set <i>dark mode</i> as your prefered theme.</span>
-      },
-      {
-        id: 'noWarningForMissingPermissions',
-        style: { display: this.props.hasExtendedPermissions ? 'none' : 'flex' },
-        label: 'No warning for missing permissions.',
-        description: 'To work best, DemoRobot requires permissions to interact with all sites, and will warn you if you don\'t provide those permissions. Turn this feature on to remove this warning.'
-      },
-      {
-        id: 'registerProtocolHandler',
-        label: 'Register Protocol Handler.',
-        description: 'Turn this feature on to register web+mnky to be handled by demorobot.'
-      },
-      {
-        id: 'writeLogs',
-        label: 'Write Logs.',
-        description: <span>Turn this feature on to have a DemoRobot logs accessible via the <b>Logs</b> navigation item.</span>
-      },
-      {
-        id: 'hookIntoKonva',
-        label: 'Hook into konva.js API.',
-        description: <span>Turn this feature on to allow DemoRobot to hook into <a href="https://konvajs.org/" target="_blank" rel='noopener noreferrer'>konva.js</a> API to modify text on canvas.</span>
+    const optionalFeatures = OptionalFeature.getAll({
+      styles: {
+        preferDarkMode: { display: this.props.settings.optionalFeatures.syncDarkMode ? 'none' : 'flex' }
       }
-    ]
+    })
 
     return (
       <div className="content">
@@ -166,22 +125,55 @@ class Settings extends React.Component {
               }
             </Pane>
             <Pane label="Base Template" name="baseTemplate">
-              <div className="template-box">
-                <label htmlFor="template">This base template will be used for new configurations you create. It will auto-save while you edit it.</label>
+                <label htmlFor="template">
+                  <p>
+                    This base template will be used for new configurations you create. It will auto-save while you edit it.
+                  </p>
+                  <p>
+                    <button className="save-button" onClick={() => this.saveBaseTemplate()}>Save</button>
+                    <span style={{ display: this.props.settings.baseTemplate === this.state.baseTemplate ? 'none' : 'inline' }} className="unsaved-warning">(Unsaved Changes)</span>
+                  </p>
+                </label>
+                <CodeEditor value={this.state.baseTemplate}
+                  onChange={(content) => this.updateBaseTemplate(content)}
+                  annotations={(content) => {}}
+                  getRepository={this.props.getRepository}
+                  variables={[]}
+                  onVimWrite={() => this.handleClick(null, 'save')}
+                  onAutoSave={(event) => this.props.settings.optionalFeatures.autoSave ? this.saveBaseTemplate() : event.preventDefault() }
+                  keyboardHandler={this.props.settings.optionalFeatures.keyboardHandlerVim ? 'vim' : null}
+                  editorAutocomplete={this.props.settings.optionalFeatures.editorAutocomplete}
+                  isDarkMode={this.props.isDarkMode}
+                />
+            </Pane>
+            <Pane label="Global Variables" name="globalVariables">
+              <GlobalVariables globalVariables={this.props.settings.globalVariables} onSaveGlobalVariables={this.props.onSaveGlobalVariables} isDarkMode={this.props.isDarkMode} />
+            </Pane>
+            <Pane label="Demo Analytics" name="analytics">
+              <div>
+                <label htmlFor="template">
+                  <p>
+                    If your demo team asks you to provide analytics on your usage of their platform, this is the right place!
+                    Put a snippet of any end user monitoring or analytics solution (AppDynamics, Matamo, Plausible) into this box
+                    and it will be injected when an @include[] in your demo configuration matches.
+                  </p>
+                  <p>
+                    <button className="save-button" onClick={() => this.saveAnalyticsSnippet()}>Save</button>
+                    <span style={{ display: this.props.settings.analyticsSnippet === this.state.analyticsSnippet ? 'none' : 'inline' }} className="unsaved-warning">(Unsaved Changes)</span>
+                  </p>
+                </label>
                 <AceEditor
                   height="400px"
                   width="100%"
                   minLines={20}
                   theme={ this.props.isDarkMode ? 'merbivore' : 'xcode' }
-                  mode="mnky"
-                  value={this.props.settings.baseTemplate}
+                  mode="html"
+                  value={this.state.analyticsSnippet}
                   name="template"
+                  onChange={(content) => this.updateAnalyticsSnippet(content)}
                   editorProps={{ $blockScrolling: true }}
-                  onChange={this.props.onSetBaseTemplate} />
+                  />
               </div>
-            </Pane>
-            <Pane label="Global Variables" name="globalVariables">
-              <GlobalVariables globalVariables={this.props.settings.globalVariables} onSaveGlobalVariables={this.props.onSaveGlobalVariables} isDarkMode={this.props.isDarkMode} />
             </Pane>
             <Pane label="More" name="more">
               <h2>{'Monkey\'s Behavior'}</h2>
@@ -199,6 +191,7 @@ class Settings extends React.Component {
               You can always open the <a href="backup.html">backup page</a> to download your files or manipulate your settings. Please use with caution!
               <button className="save-button" onClick={(event) => this.props.onDownloadAll(event)}>Download all configurations</button>
               <button className="delete-button" onClick={(event) => this.props.onDeleteAll(event)}>Download & Delete all configurations</button>
+              <button className="delete-button" onClick={(event) => this.props.onReset(event)}>Reset DemoMonkey</button>
             </Pane>
           </Tabs>
         </div>

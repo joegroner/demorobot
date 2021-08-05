@@ -1,7 +1,20 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 import { v4 as uuidV4 } from 'uuid'
 import omit from 'lodash.omit'
 
-function blacklist(object) {
+function blocklist(object) {
   return omit(object, ['__v', 'owner', '_id'])
 }
 
@@ -31,11 +44,11 @@ const configuration = (state, action) => {
       if (action.configuration.id === 'new') {
         delete action.configuration.id
       }
-      return Object.assign({ id: uuidV4(), created_at: Date.now(), updated_at: Date.now() }, blacklist(action.configuration), { enabled: false })
+      return Object.assign({ id: uuidV4(), created_at: Date.now(), updated_at: Date.now() }, blocklist(action.configuration), { enabled: false })
     case 'SAVE_CONFIGURATION':
       // the last array is a hot fix for issue #16
       // saving the configuration should currently not include overwriting the enabled state
-      return Object.assign({}, state, blacklist(action.configuration), { enabled: state.enabled, updated_at: action.sync === true ? action.configuration.updated_at : Date.now() })
+      return Object.assign({}, state, blocklist(action.configuration), { enabled: state.enabled, updated_at: action.sync === true ? action.configuration.updated_at : Date.now() })
     case 'DELETE_CONFIGURATION':
       return {
         ...state,

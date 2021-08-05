@@ -1,10 +1,23 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 import Configuration from './Configuration'
 import Repository from './Repository'
 import UndoElement from '../commands/UndoElement'
 import { logger } from '../helpers/logger'
 
 class Monkey {
-  constructor(rawConfigurations, scope, globalVariables, withUndo = true, intervalTime = 100, urlManager = false, ajaxManager = false, featureFlags = {}) {
+  constructor(rawConfigurations, scope, globalVariables, withUndo = true, intervalTime = 100, urlManager = false, inlineRuleManager = false, featureFlags = {}) {
     this.scope = scope
     this.globalVariables = globalVariables
     this.undo = []
@@ -25,10 +38,8 @@ class Monkey {
       return [rawConfig.name, config]
     })
     this.urlManager = urlManager === false ? { add: () => {}, remove: () => {}, clear: () => {} } : urlManager
-    this.ajaxManager = ajaxManager === false ? { add: () => {}, run: () => {}, clear: () => {} } : ajaxManager
+    this.inlineRuleManager = inlineRuleManager === false ? { add: () => {}, run: () => {}, clear: () => {} } : inlineRuleManager
     this.observers = []
-
-    this.hookIntoKonvaSent = false
   }
 
   addObserver(observer) {
@@ -69,7 +80,7 @@ class Monkey {
   applyOnce(configuration) {
     // Execute the commands for webRequest hooks only once
     this.addUndo(configuration.apply(this.urlManager, 'value', 'url'))
-    this.addUndo(configuration.apply(this.ajaxManager, 'value', 'ajax'))
+    this.addUndo(configuration.apply(this.inlineRuleManager, 'value', 'ajax'))
   }
 
   apply(configuration) {
@@ -77,7 +88,7 @@ class Monkey {
     const sum = {}
     // Some UIs provide corner cases we want to cover with DemoMonkey for ease of use
     // Most of them are text, that is shortened or split over multiple elements.
-    // We do them early, because later modfications may cause problems to get them solved.
+    // We do them early, because later modifications may cause problems to get them solved.
     this._cornerCases(configuration)
 
     sum.text = (this._applyOnXpathGroup(configuration, '//body//text()[ normalize-space(.) != ""]', 'text', 'data'))
@@ -87,7 +98,6 @@ class Monkey {
     sum.input = (this._applyOnXpathGroup(configuration, '//body//input', 'input', 'value'))
     sum.image = (this._applyOnXpathGroup(configuration, '//body//img', 'image', 'src'))
     sum.image += (this._applyOnXpathGroup(configuration, '//body//div[contains(@ad-test-id, "dash-image-widget-renderer")]', 'image', 'style.backgroundImage'))
-    sum.link = (this._applyOnXpathGroup(configuration, '//body//a', 'link', 'href'))
     sum.dashboard = (this._applyOnXpathGroup(configuration, '//body//div[contains(@class, "ads-dashboard-canvas-pane")]', 'ad-dashboard', 'style'))
 
     // Apply the text commands on the title element
@@ -95,13 +105,6 @@ class Monkey {
 
     // Finally we can apply document commands on the document itself.
     this.addUndo(configuration.apply(this.scope.document, 'documentElement', 'document'))
-
-    if (!this.hookIntoKonvaSent && this.scope.document.querySelectorAll('.konvajs-content').length > 0) {
-      this.scope.postMessage({
-        task: 'hook-into-konva'
-      })
-      this.hookIntoKonvaSent = true
-    }
 
     this.notifyObservers({
       type: 'applied',
@@ -225,10 +228,12 @@ class Monkey {
       configuration.apply(pseudoNode, 'value', 'text')
       if (node.dataset.fullString !== pseudoNode.value) {
         const original = node.textContent
+        const originalFullString = node.dataset.fullString
         const replacement = original.length < pseudoNode.value.length ? '...' + pseudoNode.value.substring(pseudoNode.value.length - original.length - 3) : pseudoNode.value
         node.dataset.fullString = pseudoNode.value
         node.textContent = replacement
         undos.push(new UndoElement(node, 'textContent', original, node.textContent))
+        undos.push(new UndoElement(node.dataset, 'fullString', originalFullString, node.dataset.fullString))
       }
     })
     this.addUndo(undos)
@@ -263,14 +268,7 @@ class Monkey {
     }
 
     this.urlManager.clear()
-    this.ajaxManager.clear()
-
-    if (this.hookIntoKonvaSent) {
-      this.scope.postMessage({
-        task: 'remove-hook-into-konva'
-      })
-      this.hookIntoKonvaSent = false
-    }
+    this.inlineRuleManager.clear()
   }
 
   runAll() {

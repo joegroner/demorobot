@@ -1,8 +1,21 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 import Monkey from './models/Monkey'
 import ModeManager from './models/ModeManager'
 import Settings from './models/Settings'
 import Manifest from './models/Manifest'
-import AjaxManager from './models/AjaxManager'
+import InlineRuleManager from './models/InlineRuleManager'
 import UrlManager from './models/UrlManager'
 import { Store } from 'webext-redux'
 import { logger, connectLogger } from './helpers/logger'
@@ -39,8 +52,8 @@ try {
         }
       }
 
-      function updateBadge(count) {
-        console.log('Updating Badge')
+      function onStart(count) {
+        console.log('Updating Badge:', count)
         if (isTopFrame()) {
           scope.chrome.runtime.sendMessage({
             receiver: 'background',
@@ -58,7 +71,7 @@ try {
 
         const inlineConfig = {
           hookIntoAjax: settings.isFeatureEnabled('hookIntoAjax'),
-          hookIntoKonva: settings.isFeatureEnabled('hookIntoKonva')
+          hookIntoHyperGraph: settings.isFeatureEnabled('hookIntoHyperGraph')
         }
 
         const inlineConfigScriptTag = scope.document.createElement('script')
@@ -73,29 +86,29 @@ try {
         // every time the store is updated, which would lead to a loop.
         const urlManager = new UrlManager(scope, isTopFrame())
 
-        const ajaxManager = new AjaxManager(scope, settings.isFeatureEnabled('hookIntoAjax'))
+        const inlineRuleManager = new InlineRuleManager(scope, inlineConfig)
 
-        let $DEMO_MONKEY = new Monkey(store.getState().configurations, scope, settings.globalVariables, settings.isFeatureEnabled('undo'), settings.monkeyInterval, urlManager, ajaxManager, {
+        let $DEMO_MONKEY = new Monkey(store.getState().configurations, scope, settings.globalVariables, settings.isFeatureEnabled('undo'), settings.monkeyInterval, urlManager, inlineRuleManager, {
           withEvalCommand: settings.isFeatureEnabled('withEvalCommand'),
           hookIntoAjax: settings.isFeatureEnabled('hookIntoAjax'),
           webRequestHook: settings.isFeatureEnabled('webRequestHook')
         })
-        updateBadge($DEMO_MONKEY.start())
+        onStart($DEMO_MONKEY.start())
         logger('debug', 'DemoMonkey enabled. Tampering the content. Interval: ', settings.monkeyInterval).write()
 
-        const modeManager = new ModeManager(scope, $DEMO_MONKEY, new Manifest(scope.chrome), settings.isDebugEnabled(), settings.isFeatureEnabled('debugBox'), settings.isLiveModeEnabled())
+        const modeManager = new ModeManager(scope, $DEMO_MONKEY, new Manifest(scope.chrome), settings.isDebugEnabled(), settings.isFeatureEnabled('debugBox'), settings.isLiveModeEnabled(), settings.analyticsSnippet)
 
         function restart() {
           logger('debug', 'Restart DemoMonkey').write()
           // Update settings
           const settings = new Settings(store.getState().settings)
-          const newMonkey = new Monkey(store.getState().configurations, scope, settings.globalVariables, settings.isFeatureEnabled('undo'), settings.monkeyInterval, urlManager, ajaxManager, {
+          const newMonkey = new Monkey(store.getState().configurations, scope, settings.globalVariables, settings.isFeatureEnabled('undo'), settings.monkeyInterval, urlManager, inlineRuleManager, {
             withEvalCommand: settings.isFeatureEnabled('withEvalCommand'),
             hookIntoAjax: settings.isFeatureEnabled('hookIntoAjax'),
             webRequestHook: settings.isFeatureEnabled('webRequestHook')
           })
           $DEMO_MONKEY.stop()
-          updateBadge(newMonkey.start())
+          onStart(newMonkey.start())
           $DEMO_MONKEY = newMonkey
           modeManager.reload($DEMO_MONKEY, settings.isDebugEnabled(), settings.isFeatureEnabled('debugBox'), settings.isLiveModeEnabled())
         }

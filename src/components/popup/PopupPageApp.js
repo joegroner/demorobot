@@ -1,4 +1,16 @@
-/* global chrome */
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 import React from 'react'
 import Tabs from '../shared/Tabs'
 import Pane from '../shared/Pane'
@@ -8,21 +20,21 @@ import { connect } from 'react-redux'
 import ConfigurationList from './ConfigurationList'
 import PropTypes from 'prop-types'
 
-const manifest = new Manifest(chrome)
-
 /* The PopupPageApp will be defined below */
 class App extends React.Component {
   static propTypes = {
     currentUrl: PropTypes.string,
     actions: PropTypes.objectOf(PropTypes.func).isRequired,
     configurations: PropTypes.arrayOf(PropTypes.object).isRequired,
-    settings: PropTypes.object.isRequired
+    settings: PropTypes.object.isRequired,
+    manifest: PropTypes.instanceOf(Manifest).isRequired
   }
 
   constructor(props) {
     super(props)
     this.state = {
-      activeTab: 'apply'
+      activeTab: 'apply',
+      commitHash: false
     }
   }
 
@@ -35,7 +47,8 @@ class App extends React.Component {
   }
 
   render() {
-    var configurations = this.props.configurations.filter((config) => typeof config.deleted_at === 'undefined' && typeof config._deleted === 'undefined')
+    const manifest = this.props.manifest
+    const configurations = this.props.configurations.filter((config) => typeof config.deleted_at === 'undefined' && typeof config._deleted === 'undefined')
     return <Page preferDarkMode={this.props.settings.optionalFeatures.preferDarkMode} syncDarkMode={this.props.settings.optionalFeatures.syncDarkMode}>
       <Tabs activeTab={this.state.activeTab} onNavigate={(e) => this.updateActiveTab(e)}>
         <Pane label="Apply" name="apply">
@@ -57,10 +70,18 @@ class App extends React.Component {
             </b>
             {manifest.version()}
           </div>
+          <div>
+            <b>Build from </b>
+            {manifest.buildFromLink()}
+          </div>
+          <div>
+            <b>Report bugs at </b>
+            {manifest.supportLink()}
+          </div>
         </Pane>
         <Pane link={(e) => {
           e.preventDefault()
-          chrome.runtime.openOptionsPage()
+          window.chrome.runtime.openOptionsPage()
         }} label="Dashboard"/>
       </Tabs>
     </Page>

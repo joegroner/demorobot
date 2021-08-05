@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "DemoRobot",
   "description": "Tamper your application's UI to demo almost anything",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Joe Groner <joe.groner@datarobot.com>",
   "homepage_url": "https://github.com/joegroner/demorobot/",
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
@@ -13,6 +13,7 @@
   },
   "web_accessible_resources": [
     "manifest.json",
+    "COMMITHASH",
     "js/inline.js"
   ],
   "background": {
@@ -28,7 +29,7 @@
     "default_popup": "popup.html"
   },
   "permissions": [
-    "storage", "unlimitedStorage", "activeTab", "contextMenus", "identity"
+    "storage", "unlimitedStorage", "activeTab", "contextMenus"
   ],
   "optional_permissions": [
     "<all_urls>", "webRequest", "webRequestBlocking"

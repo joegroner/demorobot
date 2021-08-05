@@ -1,4 +1,19 @@
-/* eslint no-template-curly-in-string: "off" */
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* eslint-disable no-template-curly-in-string */
+
 import SearchAndReplace from './SearchAndReplace'
 import Protect from './Protect'
 import Style from './Style'
@@ -6,7 +21,6 @@ import Hide from './Hide'
 import Group from './Group'
 import ReplaceImage from './ReplaceImage'
 import RecolorImage from './RecolorImage'
-import ReplaceLink from './ReplaceLink'
 import ReplaceNeighbor from './ReplaceNeighbor'
 import InsertHTML from './InsertHTML'
 import OverwriteHTML from './OverwriteHTML'
@@ -14,23 +28,29 @@ import ReplaceFlowmapIcon from './appdynamics/ReplaceFlowmapIcon'
 import ReplaceFlowmapConnection from './appdynamics/ReplaceFlowmapConnection'
 import RecolorDashboard from './appdynamics/RecolorDashboard'
 import SetDashboardBackground from './appdynamics/SetDashboardBackground'
-import DelayLink from './appdynamics/DelayLink'
 import ReplaceGeoStatus from './appdynamics/ReplaceGeoStatus'
 import RemoveFlowmapNode from './appdynamics/RemoveFlowmapNode'
 import AddFlowmapNode from './appdynamics/AddFlowmapNode'
-import BlockUrl from './BlockUrl'
-import DelayUrl from './DelayUrl'
-import ReplaceUrl from './ReplaceUrl'
+import InterceptWebRequest from './InterceptWebRequest'
 import Eval from './Eval'
 import Stage from './Stage'
 import UndoElement from './UndoElement'
 import QuerySelector from './QuerySelector'
 import If from './If'
+import AddScript from './AddScript'
 import ReplaceAjaxResponse from './ReplaceAjaxResponse'
 import PatchAjaxResponse from './PatchAjaxResponse'
 import extractParameters from '../helpers/extractParameters'
 
 export default [
+  {
+    name: 'addScript',
+    signature: '(${1}) = ${3}',
+    aliases: [],
+    command: function (value, parameters, location, includeRules, excludeRules, cmdBuilder) {
+      return new AddScript(parameters, value)
+    }
+  },
   {
     name: 'replaceAjaxResponse',
     aliases: ['replaceAjax', 'replaceResponse'],
@@ -152,7 +172,7 @@ export default [
     aliases: [],
     signature: '(${1}) = ${2}',
     command: function (value, parameters, location, includeRules, excludeRules, cmdBuilder) {
-      return new ReplaceImage(parameters[0], value, parameters[1])
+      return new ReplaceImage(value, parameters)
     }
   },
   {
@@ -169,7 +189,7 @@ export default [
     signature: '(${1}) = ${2}',
     deprecated: true,
     command: function (value, parameters, location, includeRules, excludeRules, cmdBuilder) {
-      return new ReplaceLink(parameters[0], value)
+      return new QuerySelector(`a[href="${parameters[0]}"]`, 'href', value)
     }
   },
   {
@@ -177,7 +197,7 @@ export default [
     aliases: [],
     signature: '(${1})',
     command: function (value, parameters, location, includeRules, excludeRules, cmdBuilder) {
-      return new BlockUrl(parameters[0], parameters[1], includeRules, excludeRules)
+      return new InterceptWebRequest(parameters[0], value, 'block', parameters[1], includeRules, excludeRules)
     }
   },
   {
@@ -185,7 +205,7 @@ export default [
     aliases: [],
     signature: '(${1}) = ${2}',
     command: function (value, parameters, location, includeRules, excludeRules, cmdBuilder) {
-      return new DelayUrl(parameters[0], value, parameters[1], includeRules, excludeRules)
+      return new InterceptWebRequest(parameters[0], value, 'delay', parameters[1], includeRules, excludeRules)
     }
   },
   {
@@ -193,7 +213,7 @@ export default [
     aliases: ['redirectUrl'],
     signature: '(${1}) = ${2}',
     command: function (value, parameters, location, includeRules, excludeRules, cmdBuilder) {
-      return new ReplaceUrl(parameters[0], value, parameters[1], includeRules, excludeRules)
+      return new InterceptWebRequest(parameters[0], value, 'replace', parameters[1], includeRules, excludeRules)
     }
   },
   {
@@ -209,7 +229,7 @@ export default [
     aliases: [],
     signature: '(${1}, ${2}) = ${3}',
     command: function (value, parameters, location, includeRules, excludeRules, cmdBuilder) {
-      var iframeCode = '<head><title>' + parameters[1] + '</title><style>html {height:100%;}</style></head><body style="margin:0;padding:0;width:100%;height:100%;overflow:hidden;"><iframe src="' + value + '" style="width:100%;height:100%"></body>'
+      const iframeCode = '<head><title>' + parameters[1] + '</title><style>html {height:100%;}</style></head><body style="margin:0;padding:0;width:100%;height:100%;overflow:hidden;"><iframe src="' + value + '" style="width:100%;height:100%"></body>'
       return new OverwriteHTML(parameters[0], '', iframeCode, location)
     }
   },
@@ -226,7 +246,7 @@ export default [
     aliases: [],
     signature: '(${1}) = ${2}',
     command: function (value, parameters, location, includeRules, excludeRules, cmdBuilder) {
-      return new Stage(parameters, value)
+      return new Stage(parameters[0], parameters[1], value)
     }
   },
   {
@@ -236,6 +256,39 @@ export default [
       signature: '(${1})',
       command: function (value, parameters, location, includeRules, excludeRules, cmdBuilder) {
         return new Hide(parameters[0], 17, 'list-group-item', '', '', location)
+      }
+    }]
+  },
+  {
+    name: 'segment',
+    registry: [{
+      name: 'analyticsLoad',
+      signature: '(${1})',
+      command: function (value, parameters, location, includeRules, excludeRules, cmdBuilder) {
+        const script = `  !function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","once","off","on","addSourceMiddleware","addIntegrationMiddleware","setAnonymousId","addDestinationMiddleware"];analytics.factory=function(e){return function(){var t=Array.prototype.slice.call(arguments);t.unshift(e);analytics.push(t);return analytics}};for(var e=0;e<analytics.methods.length;e++){var key=analytics.methods[e];analytics[key]=analytics.factory(key)}analytics.load=function(key,e){var t=document.createElement("script");t.type="text/javascript";t.async=!0;t.src="https://cdn.segment.com/analytics.js/v1/" + key + "/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n);analytics._loadOptions=e};analytics._writeKey="YOUR_WRITE_KEY";analytics.SNIPPET_VERSION="4.13.2";
+        analytics.load(${value});
+        analytics.page();
+        }}();`
+        return new AddScript([], script)
+      }
+    },
+    {
+      name: 'analyticsIdentify',
+      signature: '(${1}, ${2}, ${3})',
+      command: function (value, parameters, location, includeRules, excludeRules, cmdBuilder) {
+        const script = `analytics.identify('${parameters[0]}', {
+          name: '${parameters[1]}',
+          email: '${parameters[2]}'
+        });`
+        return new AddScript([], script)
+      }
+    },
+    {
+      name: 'analyticsTrack',
+      signature: '(${1}) = ${2}',
+      command: function (value, parameters, location, includeRules, excludeRules, cmdBuilder) {
+        const script = `analytics.identify('${parameters[0]}', ${JSON.stringify(value)});`
+        return new AddScript([], script)
       }
     }]
   },
@@ -402,14 +455,6 @@ export default [
       }
     },
     {
-      name: 'delayLink',
-      aliases: [],
-      signature: '(${1}) = ${2}',
-      command: function (value, parameters, location, includeRules, excludeRules, cmdBuilder) {
-        return new DelayLink(parameters[0], value, window)
-      }
-    },
-    {
       name: 'recolorDashboard',
       aliases: ['recolourDashboard'],
       signature: '(${1}, ${2}) = ${3}',
@@ -430,16 +475,17 @@ export default [
       aliases: [],
       signature: '(${1}, ${2}) = ${3}',
       command: function (value, parameters, location, includeRules, excludeRules, cmdBuilder) {
-        if (typeof value === 'string' && ['λ', 'lambda'].includes(value.toLowerCase())) {
+        if (typeof value === 'string' && ['λ', 'lambda', 'otel', 'opentelemetry'].includes(value.toLowerCase())) {
+          const imageName = ['λ', 'lambda'].includes(value.toLowerCase()) ? 'AWSLambda' : 'openTelemetry'
           return new Group([
             new ReplaceNeighbor(parameters[0], '', 2, 'text.adsNodeCountText', '', '', location),
             new ReplaceNeighbor(parameters[0], '', 2, 'text.adsNodeCountTextLarge', '', '', location),
             new ReplaceNeighbor(parameters[0], '', 2, 'text.adsNodeCountTextSmall', '', '', location),
-            new ReplaceNeighbor(parameters[0], 'images/tierTypes/AWSLambda.svg', 2, 'g.adsNodeCountContainer image', '', '', location, (search, replace, node) => {
+            new ReplaceNeighbor(parameters[0], 'images/tierTypes/' + imageName + '.svg', 2, 'g.adsNodeCountContainer image', '', '', location, (search, replace, node) => {
               // <image transform="translate(-15, -15 )" width="30" height="30" xlink:href=""></image>
               const bg = node.parentElement.querySelector('.adsNodeCountBackground')
               if (bg && bg.style && bg.style.fill !== 'rgb(255, 255, 255)') {
-                replace = 'images/tierTypes/AWSLambda_white.svg'
+                replace = 'images/tierTypes/' + imageName + '_white.svg'
               }
               if (node.href.baseVal !== replace) {
                 const original = node.href.baseVal

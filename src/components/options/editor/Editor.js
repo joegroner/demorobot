@@ -1,7 +1,20 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 import React from 'react'
 import Tabs from '../../shared/Tabs'
 import Pane from '../../shared/Pane'
-import Variable from './Variable'
+import Variable from '../../shared/Variable'
 import CodeEditor from './CodeEditor'
 import Configuration from '../../../models/Configuration'
 import PropTypes from 'prop-types'
@@ -61,7 +74,7 @@ class Editor extends React.Component {
     if (event) {
       event.preventDefault()
     }
-    var config = this.state.currentConfiguration
+    const config = this.state.currentConfiguration
     config[key] = value
     this.setState({ currentConfiguration: config, unsavedChanges: true }, function () {
       if (key === 'hotkeys') {
@@ -76,7 +89,7 @@ class Editor extends React.Component {
   }
 
   updateVariable(id, value) {
-    var values = this.state.currentConfiguration.values ? this.state.currentConfiguration.values : {}
+    const values = this.state.currentConfiguration.values ? this.state.currentConfiguration.values : {}
     if (value === null) {
       delete values[id]
     } else {
@@ -125,14 +138,14 @@ class Editor extends React.Component {
   }
 
   _buildAnnotations(content) {
-    var result = []
+    const result = []
 
     const lines = content.split('\n')
 
     // Capture namespaces for the command builder.
     const nsPattern = /^@namespace(?:\[\])?\s*=\s*(.*)$/mg
-    var match
-    var namespaces = []
+    let match
+    const namespaces = []
     while ((match = nsPattern.exec(content))) {
       namespaces.push(match[1])
     }
@@ -142,8 +155,8 @@ class Editor extends React.Component {
     lines.forEach((line, rowIdx) => {
       // Process each line and add infos, warnings, errors
       // Multiple = signs can lead to issues, add an info
-      if ((line.match(/(?:^=)|(?:[^\\]=)/g) || []).length > 1) {
-        result.push({ row: rowIdx, column: 0, text: 'Your line contains multiple equals signs (=)!\nThe first will be used to seperate search and replacement.\nQuote the equal signs that are part of your patterns.', type: 'warning' })
+      if ((line.replaceAll('\\=', '\u2260').match(/(?:^=)|(?:[^\\]=)/g) || []).length > 1) {
+        result.push({ row: rowIdx, column: 0, text: 'Your line contains multiple equals signs (=)!\nThe first will be used to separate search and replacement.\nQuote the equal signs that are part of your patterns.', type: 'warning' })
       }
 
       // Check if an imported configuration is available
@@ -152,7 +165,7 @@ class Editor extends React.Component {
       }
 
       if (line.startsWith('!') && line.length > 1) {
-        const [lhs, rhs] = line.replace('\\=', '\u2260').split('=')
+        const [lhs, rhs] = line.replaceAll('\\=', '\u2260').split('=')
         const cmd = cb.build(lhs.trim(), typeof rhs === 'string' ? rhs.trim() : '')
         if (cmd instanceof ErrorCommand) {
           // `Command "${command}" not found.\nPlease check the spelling and\nif all required namespaces are loaded.`
@@ -168,7 +181,7 @@ class Editor extends React.Component {
       }
 
       if (line.includes('=')) {
-        const [lhs, rhs] = line.split(/=(.+)/, 2).map(e => e.trim())
+        const [, rhs] = line.split(/=(.+)/, 2).map(e => e.trim())
         if (typeof rhs === 'string' && rhs.startsWith('/') && rhs.endsWith('/')) {
           result.push({ row: rowIdx, column: 0, text: 'expression = regex', type: 'info' })
         }
@@ -264,7 +277,7 @@ class Editor extends React.Component {
             <div className="scrolling-pane">
               {variables.length > 0 ? '' : <div className="no-variables">No variables defined</div>}
               {variables.map((variable, index) => {
-                return <Variable key={variable.id} onValueUpdate={(id, value) => this.updateVariable(id, value)} variable={variable} isDarkMode={this.props.isDarkMode} />
+                return <Variable isGlobal={false} key={variable.id} onUpdate={(id, value) => this.updateVariable(id, value)} variable={variable} isDarkMode={this.props.isDarkMode} />
               })}
             </div>
           </Pane>
