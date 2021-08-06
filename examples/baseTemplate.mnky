@@ -3,7 +3,8 @@
 ; side and change it to your own needs!
 
 ; Script only run on the demo environments by default
-@include[] = /^https?://.*app.*\.datarobot\.com(:[0-9]+)?/.*$/
+@include[] = /^https?://.*\.datarobot\.com(:[0-9]+)?/.*$/
+@include[] = /^https?://.*\.demorobot\.com(:[0-9]+)?/.*$/
 
 ; Make the use of DR commands easier by importing the namespace
 ; @namespace[] = datarobot
